@@ -1,3 +1,4 @@
 # asdf
 .tool-versions
 .vscode/
+db.sqlite3
