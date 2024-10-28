@@ -6,6 +6,6 @@ Showcase project for media upload, processing and streaming.
 
 -   [x] Add docker-compose.yml with database
 -   [x] Add Postgres connection to Django
--   [ ] Config core app
--   [ ] Create video media model
--   [ ] Create Tag system
+-   [x] Config core app
+-   [x] Create video media model
+-   [x] Create Tag system
