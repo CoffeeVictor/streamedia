@@ -2,6 +2,11 @@ from core.models import Tag, Video
 
 from django.contrib import admin
 
+
 # Register your models here.
-admin.site.register(Video)
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    filter_horizontal = ('tags',)
+
+
 admin.site.register(Tag)
