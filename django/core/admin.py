@@ -14,15 +14,14 @@ class VideoAdmin(admin.ModelAdmin):
     def get_urls(self) -> list[URLPattern]:
         base_urls = super().get_urls()
         custom_urls = [
-            path('<int:id>/video_upload', self.upload_video,
+            path('<int:object_id>/video_upload', self.upload_video,
                  name='core_video_upload')
         ]
 
         return base_urls + custom_urls
 
-    def upload_video(self, request, id):
+    def upload_video(self, request, object_id):
         print('Request:', request)
-        print('Id:', id)
         return render(request, 'admin/core/video_upload.html')
 
 
