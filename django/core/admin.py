@@ -1,6 +1,7 @@
 from core.models import Tag, Video
 
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import path
 from django.urls.resolvers import URLPattern
 
@@ -19,8 +20,10 @@ class VideoAdmin(admin.ModelAdmin):
 
         return base_urls + custom_urls
 
-    def upload_video(self):
-        pass
+    def upload_video(self, request, id):
+        print('Request:', request)
+        print('Id:', id)
+        return render(request, 'admin/core/video_upload.html')
 
 
 admin.site.register(Tag)
