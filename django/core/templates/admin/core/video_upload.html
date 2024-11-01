@@ -1,1 +1,32 @@
-<h1>Hello World from video_upload.html</h1>
+{% extends "admin/base.html" %} {% block content %}
+<form id="upload-form" method="post" enctype="multipart/form-data">
+	<p id="errornote" class="errornote hidden"></p>
+	{% csrf_token %}
+	<div class="form-row">
+		<strong>Title:</strong> {{ video.title }}
+		<br />
+		<strong>Status:</strong> {{ video.get_video_status_display }}
+	</div>
+	<div class="form-row">
+		<input type="file" name="video" accept="video/mp4" />
+	</div>
+	<div class="submit-row">
+		<input
+			type="submit"
+			value="Upload"
+			class="default"
+			name="btnUploadVideo"
+			id="btnUploadVideo"
+		/>
+	</div>
+</form>
+
+<div id="progress-bar" style="width: 100%; background: #f3f3f3">
+	<div
+		id="progress"
+		style="width: 0%; height: 20px; background: #4caf50; text-align: center"
+	>
+		0%
+	</div>
+</div>
+{% endblock %}
