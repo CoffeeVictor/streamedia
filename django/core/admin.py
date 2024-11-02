@@ -1,10 +1,13 @@
 from urllib.request import Request
 
-from core.forms import VideoChunkUploadForm
+from core.forms import VideoChunkFinishUploadForm, VideoChunkUploadForm
 from core.models import Tag, Video
-from core.services import VideoService, create_video_service_factory
+from core.services import (VideoChunkUploadException,
+                           VideoMediaInvalidStatusException,
+                           VideoMediaNotExistsException, VideoService,
+                           create_video_service_factory)
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import csrf_protect_m
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -55,8 +58,27 @@ class VideoAdmin(admin.ModelAdmin):
             'id': object_id
         })
 
-    def video_upload_finish(self, request: Request, object_id: int):
-        print('Upload finish fn')
+    def video_upload_finish(self, request, object_id):
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+        form = VideoChunkFinishUploadForm(request.POST)
+
+        if not form.is_valid():
+            return JsonResponse({'error': form.errors}, status=400)
+
+        try:
+            create_video_service_factory().finalize_upload(
+                object_id, form.cleaned_data['totalChunks'])
+        except Video.DoesNotExist:
+            return JsonResponse({'error': 'Video not found'}, status=404)
+        except (VideoMediaNotExistsException, VideoMediaInvalidStatusException, VideoChunkUploadException) as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+        self.message_user(
+            request, 'Upload successful', messages.SUCCESS)
+
+        return JsonResponse({}, status=204)
 
 
 admin.site.register(Tag)
