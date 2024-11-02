@@ -56,4 +56,4 @@ class Video(models.Model):
 class VideoMedia(Media):
     path = models.CharField(max_length=255, verbose_name='Video Path')
     video = models.OneToOneField(
-        Video, on_delete=models.PROTECT, verbose_name='Media', related_name='video')
+        Video, on_delete=models.PROTECT, verbose_name='Media', related_name='video_media')

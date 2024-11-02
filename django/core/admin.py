@@ -49,7 +49,7 @@ class VideoAdmin(admin.ModelAdmin):
                 }, status=400)
             video_service = create_video_service_factory()
             video_service.process_upload(video_id=object_id,
-                                         chunk_index=form.cleaned_data['chunkIndex'], chunks=form.cleaned_data['chunk'].read())
+                                         chunk_index=form.cleaned_data['chunkIndex'], chunk=form.cleaned_data['chunk'].read())
 
         return render(request, 'admin/core/video_upload.html', {
             'id': object_id

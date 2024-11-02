@@ -51,7 +51,7 @@ class VideoService:
                 video_media = VideoMedia.objects.create(
                     video=video,
                     status=VideoMedia.Status.UPLOAD_STARTED,
-                    video_path=self.get_chunk_directory(video.id)
+                    path=self.get_chunk_directory(video.id)
                 )
             except IntegrityError:
                 video_media = VideoMedia.objects.get(video=video)
