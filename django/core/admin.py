@@ -2,7 +2,7 @@ from urllib.request import Request
 
 from core.forms import VideoChunkUploadForm
 from core.models import Tag, Video
-from core.services import VideoService
+from core.services import VideoService, create_video_service_factory
 
 from django.contrib import admin
 from django.contrib.auth.admin import csrf_protect_m
@@ -47,9 +47,9 @@ class VideoAdmin(admin.ModelAdmin):
                 return JsonResponse({
                     "errors": form.errors
                 }, status=400)
-
-            VideoService().process_upload(video_id=object_id,
-                                          chunk_index=form.cleaned_data['chunkIndex'], chunks=form.cleaned_data['chunk'].read())
+            video_service = create_video_service_factory()
+            video_service.process_upload(video_id=object_id,
+                                         chunk_index=form.cleaned_data['chunkIndex'], chunks=form.cleaned_data['chunk'].read())
 
         return render(request, 'admin/core/video_upload.html', {
             'id': object_id
