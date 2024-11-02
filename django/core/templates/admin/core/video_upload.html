@@ -107,7 +107,7 @@
 	async function uploadChunk(formData, onChunkUploaded) {
 		try {
 			const response = await fetch(
-				"{% url 'admin:core_video_upload' id=id %}",
+				"{% url 'admin:core_video_upload' object_id=id %}",
 				{
 					method: 'POST',
 					body: formData,
@@ -156,7 +156,7 @@
 		formData.append('totalChunks', totalChunks);
 
 		const response = await fetch(
-			"{% url 'admin:core_video_upload_finish' id=id %}",
+			"{% url 'admin:core_video_upload_finish' object_id=id %}",
 			{
 				method: 'POST',
 				body: formData,
@@ -168,7 +168,8 @@
 			throw new Error(`Erro on upload finish: ${textError}`);
 		}
 
-		window.location.href = "{% url 'admin:core_video_upload' id=id %}";
+		window.location.href =
+			"{% url 'admin:core_video_upload' object_id=id %}";
 	}
 
 	function updateProgress(uploadedChunks, totalChunks) {

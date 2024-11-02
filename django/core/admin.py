@@ -1,6 +1,12 @@
+from urllib.request import Request
+
+from core.forms import VideoChunkUploadForm
 from core.models import Tag, Video
+from core.services import VideoService
 
 from django.contrib import admin
+from django.contrib.auth.admin import csrf_protect_m
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import path, reverse
 from django.urls.resolvers import URLPattern
@@ -18,7 +24,9 @@ class VideoAdmin(admin.ModelAdmin):
         base_urls = super().get_urls()
         custom_urls = [
             path('<int:object_id>/video_upload', self.upload_video,
-                 name='core_video_upload')
+                 name='core_video_upload'),
+            path('<int:object_id>/video_upload/finish',
+                 self.video_upload_finish, name='core_video_upload_finish')
         ]
 
         return base_urls + custom_urls
@@ -29,9 +37,26 @@ class VideoAdmin(admin.ModelAdmin):
 
     redirect_to_upload.short_description = 'Upload'
 
-    def upload_video(self, request, object_id):
-        print('Request:', request)
-        return render(request, 'admin/core/video_upload.html')
+    @csrf_protect_m
+    def upload_video(self, request: Request, object_id: int):
+
+        if request.method == 'POST':
+            form = VideoChunkUploadForm(request.POST, request.FILES)
+
+            if not form.is_valid():
+                return JsonResponse({
+                    "errors": form.errors
+                }, status=400)
+
+            VideoService().process_upload(video_id=object_id,
+                                          chunk_index=form.cleaned_data['chunkIndex'], chunks=form.cleaned_data['chunk'].read())
+
+        return render(request, 'admin/core/video_upload.html', {
+            'id': object_id
+        })
+
+    def video_upload_finish(self, request: Request, object_id: int):
+        print('Upload finish fn')
 
 
 admin.site.register(Tag)
