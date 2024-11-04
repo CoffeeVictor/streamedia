@@ -52,7 +52,7 @@ class Video(models.Model):
     tags = models.ManyToManyField(
         Tag, verbose_name='Tags', related_name='videos', blank=True)
     author = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name='videos', verbose_name='Author')
+        User, on_delete=models.PROTECT, related_name='videos', verbose_name='Author', editable=False)
 
     def get_video_status_display(self):
         if not hasattr(self, 'video_media'):
