@@ -26,10 +26,10 @@ class VideoAdmin(admin.ModelAdmin):
     def get_urls(self) -> list[URLPattern]:
         base_urls = super().get_urls()
         custom_urls = [
-            path('<int:object_id>/video_upload', self.upload_video,
+            path('<int:object_id>/video_upload', self.admin_site.admin_view(self.upload_video_view),
                  name='core_video_upload'),
             path('<int:object_id>/video_upload/finish',
-                 self.video_upload_finish, name='core_video_upload_finish')
+                 self.admin_site.admin_view(self.video_upload_finish_view), name='core_video_upload_finish')
         ]
 
         return base_urls + custom_urls
@@ -41,7 +41,7 @@ class VideoAdmin(admin.ModelAdmin):
     redirect_to_upload.short_description = 'Upload'
 
     @csrf_protect_m
-    def upload_video(self, request: Request, object_id: int):
+    def upload_video_view(self, request: Request, object_id: int):
 
         if request.method == 'POST':
             form = VideoChunkUploadForm(request.POST, request.FILES)
@@ -58,7 +58,7 @@ class VideoAdmin(admin.ModelAdmin):
             'id': object_id
         })
 
-    def video_upload_finish(self, request, object_id):
+    def video_upload_finish_view(self, request, object_id):
         if request.method != 'POST':
             return JsonResponse({'error': 'Method not allowed'}, status=405)
 
