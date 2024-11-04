@@ -23,6 +23,14 @@ class VideoAdmin(admin.ModelAdmin):
     list_display = ('title', 'published_at', 'is_published',
                     'num_likes', 'num_views', 'redirect_to_upload', )
 
+    def get_readonly_fields(self, request: HttpRequest, obj: Video | None) -> list[str]:
+        return ['video_status', 'is_published', 'published_at', 'num_likes', 'num_views', 'author'] if not obj else [
+            'video_status', 'published_at', 'num_likes', 'num_views', 'author'
+        ]
+
+    def video_status(self, obj: Video) -> str:
+        return obj.get_video_status_display()
+
     def get_urls(self) -> list[URLPattern]:
         base_urls = super().get_urls()
         custom_urls = [
