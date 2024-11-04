@@ -30,6 +30,9 @@ class Media(models.Model):
 
 
 class Video(models.Model):
+
+    video_media: 'VideoMedia'
+
     title = models.CharField(verbose_name='Title', max_length=255)
     description = models.TextField(verbose_name='Description')
     thumbnail = models.ImageField(
