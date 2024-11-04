@@ -49,7 +49,7 @@ class VideoAdmin(admin.ModelAdmin):
             return self._do_upload_video_in_chunks(request, object_id)
 
         try:
-            video = create_video_service_factory().find_video(id)
+            video = create_video_service_factory().find_video(object_id)
             context = dict(
                 # Include common variables for rendering the admin template.
                 self.admin_site.each_context(request),
@@ -60,7 +60,7 @@ class VideoAdmin(admin.ModelAdmin):
                     video, 'video_media') else None,
                 has_view_permission=True
             )
-            return render(request, 'admin/core/upload_video.html', context)
+            return render(request, 'admin/core/video_upload.html', context)
         except Video.DoesNotExist:
             return self._get_obj_does_not_exist_redirect(
                 request, self.opts, str_id
