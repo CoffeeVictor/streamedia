@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -50,6 +51,8 @@ class Video(models.Model):
         verbose_name='Views', default=0, editable=False)
     tags = models.ManyToManyField(
         Tag, verbose_name='Tags', related_name='videos', blank=True)
+    author = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='videos', verbose_name='Author')
 
     def get_video_status_display(self):
         if not hasattr(self, 'video_media'):
