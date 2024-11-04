@@ -25,6 +25,9 @@ class Media(models.Model):
     status = models.CharField(max_length=20, verbose_name='Status',
                               choices=Status.choices, default=Status.UPLOAD_STARTED)
 
+    def get_status_display(self):
+        return Media.Status(self.status).label
+
     class Meta:
         abstract = True
 
@@ -47,6 +50,11 @@ class Video(models.Model):
         verbose_name='Views', default=0, editable=False)
     tags = models.ManyToManyField(
         Tag, verbose_name='Tags', related_name='videos', blank=True)
+
+    def get_video_status_display(self):
+        if not hasattr(self, 'video_media'):
+            return 'Pending'
+        return self.video_media.get_status_display()
 
     class Meta:
         verbose_name = 'Video'
