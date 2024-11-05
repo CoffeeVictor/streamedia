@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 )
 
 func main() {
-	println("Hello World!")
+	mergeChunks("/tmp/videos/3", "/tmp/videos/3/full.mp4")
 }
 
 func extractNumber(fileName string) int {
@@ -19,4 +23,39 @@ func extractNumber(fileName string) int {
 	}
 
 	return num
+}
+
+func mergeChunks(inputDir, outputFile string) error {
+	chunks, err := filepath.Glob(filepath.Join(inputDir, "*.chunk"))
+
+	if err != nil {
+		return fmt.Errorf("Failed to find chunks: %v", err)
+	}
+
+	sort.Slice(chunks, func(i, j int) bool {
+		return extractNumber(chunks[i]) < extractNumber(chunks[j])
+	})
+
+	output, err := os.Create(outputFile)
+
+	if err != nil {
+		return fmt.Errorf("Failed to create output file: %v", err)
+	}
+	defer output.Close()
+
+	for _, chunk := range chunks {
+		input, err := os.Open(chunk)
+
+		if err != nil {
+			return fmt.Errorf("Failed to open chunk: %v", err)
+		}
+
+		_, err = output.ReadFrom(input)
+
+		if err != nil {
+			return fmt.Errorf("Failed to write chunk %s to merged file: %v", chunk, err)
+		}
+		input.Close()
+	}
+	return nil
 }
