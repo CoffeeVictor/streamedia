@@ -26,6 +26,14 @@ func (vc *VideoConverter) Handle(msg []byte) {
 
 	if err != nil {
 		vc.LogError(task, "Failed to unmarshall task", err)
+		return
+	}
+
+	err = vc.ProcessVideo(&task)
+
+	if err != nil {
+		vc.LogError(task, "Failed to process video", err)
+		return
 	}
 }
 
