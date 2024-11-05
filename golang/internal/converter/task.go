@@ -2,7 +2,13 @@ package converter
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
 	"time"
 )
 
@@ -36,4 +42,51 @@ func (vc *VideoConverter) LogError(task VideoTask, msg string, err error) {
 	slog.Error("Processing error", slog.String("error_details", string(serialized)))
 
 	// TODO: Register error on db
+}
+
+func (vc *VideoConverter) extractNumber(fileName string) int {
+	re := regexp.MustCompile(`\d+`)
+	numStr := re.FindString(filepath.Base(fileName))
+	num, err := strconv.Atoi(numStr)
+
+	if err != nil {
+		return -1
+	}
+
+	return num
+}
+
+func (vc *VideoConverter) mergeChunks(inputDir, outputFile string) error {
+	chunks, err := filepath.Glob(filepath.Join(inputDir, "*.chunk"))
+
+	if err != nil {
+		return fmt.Errorf("Failed to find chunks: %v", err)
+	}
+
+	sort.Slice(chunks, func(i, j int) bool {
+		return vc.extractNumber(chunks[i]) < vc.extractNumber(chunks[j])
+	})
+
+	output, err := os.Create(outputFile)
+
+	if err != nil {
+		return fmt.Errorf("Failed to create output file: %v", err)
+	}
+	defer output.Close()
+
+	for _, chunk := range chunks {
+		input, err := os.Open(chunk)
+
+		if err != nil {
+			return fmt.Errorf("Failed to open chunk: %v", err)
+		}
+
+		_, err = output.ReadFrom(input)
+
+		if err != nil {
+			return fmt.Errorf("Failed to write chunk %s to merged file: %v", chunk, err)
+		}
+		input.Close()
+	}
+	return nil
 }
